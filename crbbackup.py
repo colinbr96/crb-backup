@@ -1,12 +1,23 @@
 import argparse
+import logging
 
 from src.backup import backup
 from src.initialize import initialize
 
 
+def configure_logger(verbose):
+    handler = logging.StreamHandler()
+    handler.setFormatter(fmt=logging.Formatter("%(levelname)s: %(message)s"))
+    logger = logging.getLogger()
+    logger.addHandler(handler)
+    logger.setLevel(level=logging.DEBUG if verbose else logging.INFO)
+
+
 def parse_args():
-    parser = argparse.ArgumentParser(prog='CRB Backup')
-    sub_parsers = parser.add_subparsers(dest='action')
+    parser = argparse.ArgumentParser(prog='crbbackup.py')
+    parser.add_argument('-v', '--verbose', action='store_true')
+
+    sub_parsers = parser.add_subparsers(dest='action', required=True)
 
     init_parser = sub_parsers.add_parser('init')
 
@@ -22,6 +33,8 @@ def parse_args():
 
 def main():
     args = parse_args()
+    configure_logger(args.verbose)
+
     match args.action:
         case 'init':
             initialize()
