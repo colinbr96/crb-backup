@@ -14,18 +14,18 @@ def configure_logger(verbose):
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(prog='crbbackup.py')
-    parser.add_argument('-v', '--verbose', action='store_true')
+    parser = argparse.ArgumentParser(prog="crbbackup.py")
+    parser.add_argument("-v", "--verbose", action="store_true")
 
-    sub_parsers = parser.add_subparsers(dest='action', required=True)
+    sub_parsers = parser.add_subparsers(dest="action", required=True)
 
-    init_parser = sub_parsers.add_parser('init')
+    init_parser = sub_parsers.add_parser("init")
 
-    backup_parser = sub_parsers.add_parser('backup')
-    backup_parser.add_argument('-p', '--profile', required=True)
+    backup_parser = sub_parsers.add_parser("backup")
+    backup_parser.add_argument("-p", "--profile", required=True)
 
-    restore_parser = sub_parsers.add_parser('restore')
-    restore_parser.add_argument('-p', '--profile', required=True)
+    restore_parser = sub_parsers.add_parser("restore")
+    restore_parser.add_argument("-p", "--profile", required=True)
 
     args = parser.parse_args()
     return args
@@ -36,13 +36,13 @@ def main():
     configure_logger(args.verbose)
 
     match args.action:
-        case 'init':
+        case "init":
             initialize()
-        case 'backup':
+        case "backup":
             backup(args.profile)
-        case 'restore':
-            print('Restore is not currently implemented. Please check back later.')
+        case "restore":
+            print("Restore is not currently implemented. Please check back later.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -38,7 +38,7 @@ def backup(profile_name):
     stats = BackupStats()
     files_to_backup = []
 
-    for source in profile['sources']:
+    for source in profile["sources"]:
         stats.sources += 1
         path = Path(source)
 
@@ -48,7 +48,7 @@ def backup(profile_name):
 
         if path.is_dir():
             logging.debug(f"Dir: {path}")
-            path = Path(source + '/**/*')
+            path = Path(source + "/**/*")
 
         for glob_file in glob.iglob(str(path), recursive=True):
             path = Path(glob_file)
@@ -64,12 +64,12 @@ def backup(profile_name):
 
     now = datetime.now()
     zip_filename = f'{profile["name"]}-{now.strftime("%Y-%m-%dT%H-%M-%S")}.zip'
-    logging.info(f'Creating backup archive: {zip_filename}')
+    logging.info(f"Creating backup archive: {zip_filename}")
 
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file in files_to_backup:
             zipf.write(file)
-        zipf.writestr('profile.json', json.dumps(profile, indent=2))
+        zipf.writestr("profile.json", json.dumps(profile, indent=2))
 
     stats.dst_bytes = os.path.getsize(zip_filename)
     logging.info(stats)
