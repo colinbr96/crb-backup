@@ -2,8 +2,9 @@ import logging
 import os
 import re
 import sys
+from pathlib import Path
 
-from src.profile import create_profile
+from src.profile import Profile
 
 PROFILE_REGEX = "^[A-Za-z0-9_\-]+$"
 
@@ -17,15 +18,16 @@ def initialize():
             else:
                 break
         while True:
-            destination = input("Destination directory: ")
-            if not os.path.isdir(destination):
+            destination = Path(input("Destination directory: "))
+            if not destination.exists():
                 logging.error(f"That directory does not exist")
             else:
                 break
     except KeyboardInterrupt:
         sys.exit(0)
     try:
-        profile_filename = create_profile(profile_name, destination)
+        profile = Profile(profile_name, destination)
+        profile_filename = profile.save()
     except FileExistsError:
         print(f'Error: Profile named "{profile_name}" already exists', file=sys.stderr)
         sys.exit(1)
