@@ -36,8 +36,20 @@ class BackupStats:
 
 def backup(profile_name: str):
     profile = Profile.load(profile_name)
+    files_to_backup, stats = get_files_to_backup(profile)
+
+    if not files_to_backup:
+        logging.error("No files to backup")
+        sys.exit(1)
+
+    zip_filename = archive_files(files_to_backup, profile)
+    stats.dst_bytes = os.path.getsize(zip_filename)
+    logging.info(stats)
+
+
+def get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
     stats = BackupStats()
-    files_to_backup: list[Path] = []
+    files: list[Path] = []
 
     for source in profile.sources:
         stats.sources += 1
@@ -52,25 +64,24 @@ def backup(profile_name: str):
         for glob_file in glob.iglob(str(source), recursive=True):
             source = Path(glob_file)
             if source.is_file():
-                files_to_backup.append(source)
+                files.append(source)
                 stats.files += 1
                 stats.src_bytes += source.stat().st_size
 
-    if not files_to_backup:
-        logging.error("No files to backup")
-        sys.exit(1)
+    return files, stats
 
+
+def archive_files(files: list[Path], profile: Profile):
     now = datetime.now()
     zip_filename = f'{profile.name}-{now.strftime("%Y-%m-%dT%H-%M-%S")}.zip'
     zip_filename = os.path.join(profile.destination, zip_filename)
     logging.info(f"Creating backup archive: {zip_filename}")
 
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
-        for file in files_to_backup:
+        for file in files:
             arcname = path_to_drive_letter_dir(file)
             logging.debug(f"Adding: {arcname}")
             zipf.write(file, arcname)
         zipf.writestr("profile.json", json.dumps(profile.to_json()))
 
-    stats.dst_bytes = os.path.getsize(zip_filename)
-    logging.info(stats)
+    return zip_filename

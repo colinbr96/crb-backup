@@ -20,7 +20,7 @@ class Profile:
         if os.path.exists(filename):
             raise FileExistsError(f"Profile {self.name} already exists")
         with open(filename, "w") as f:
-            json.dump(obj, f)
+            json.dump(obj, f, indent=2)
         return filename
 
     def to_json(self):
