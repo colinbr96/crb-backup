@@ -3,13 +3,13 @@ import json
 import os
 import sys
 
+DEFAULT_PROFILE = {"version": "1", "name": "", "sources": [], "destination": ""}
 
-DEFAULT_PROFILE = {"version": "1", "name": "", "sources": []}
 
-
-def create_profile(name):
+def create_profile(name, destination):
     profile = copy.deepcopy(DEFAULT_PROFILE)
     profile["name"] = name
+    profile["destination"] = destination
 
     os.makedirs("profiles", exist_ok=True)
     filename = f"profiles/{name}.json"
