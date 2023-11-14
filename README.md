@@ -19,3 +19,8 @@ Reads the configuration profile and copies all input files to the specified dest
 Example: `python3 crbbackup.py restore --file <file>`
 
 Reads the configuration profile (stored in the backup file) and restores it to its original location.
+
+## Limitations
+
+- You can only create full backups. Incremental & differential backups are not supported.
+- You need to manually specify the source directories in the profile JSON file.
