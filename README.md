@@ -22,5 +22,6 @@ Reads the configuration profile (stored in the backup file) and restores it to i
 
 ## Limitations
 
+- Python 3 must be installed. Python 3.11 or higher is recommended.
 - You can only create full backups. Incremental & differential backups are not supported.
 - You need to manually specify the source directories in the profile JSON file.
