@@ -20,7 +20,7 @@ Example profile file:
   "sources": [
     "C:/Users/Colin/Saved Games/",
     "D:/Documents/**/*.pdf",
-    "D:/Documents/**/*.docx",
+    "D:/Documents/**/*.docx"
   ],
   "destination": "G:/Google Drive/Backups/CRB Backup/"
 }
@@ -44,3 +44,4 @@ Example: `python3 crbbackup.py restore --file <file>`
 ## Limitations
 
 - You can only create full backups. Incremental & differential backups are not supported.
+- Restore is not yet supported. (WIP)
