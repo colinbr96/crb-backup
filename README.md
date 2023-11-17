@@ -11,10 +11,9 @@ A Python CLI tool to create and execute filesystem backups
 5. Enter a profile name and a destination folder. The destination is where the backup zip files will be created.
 6. Edit the profile JSON file to add a list of `sources`. These are the folders that will be backed up. Feel free to use [glob](https://docs.python.org/3/library/glob.html) patterns to only match certain types of files/folders.
 
-Example profile:
+Example profile file:
 
 ```json
-// my-backup.json
 {
   "version": 1,
   "name": "my-backup",
@@ -44,6 +43,4 @@ Example: `python3 crbbackup.py restore --file <file>`
 
 ## Limitations
 
-- Python 3 must be installed. Python 3.11 or higher is recommended.
 - You can only create full backups. Incremental & differential backups are not supported.
-- You need to manually specify the source directories in the profile JSON file.
