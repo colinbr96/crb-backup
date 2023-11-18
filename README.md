@@ -35,13 +35,13 @@ Example: `python3 crbbackup.py backup --profile <profile>`
 - Reads the configuration profile and copies all input files to the specified destination.
 - To see a list of all files as they are backed up, use `crbbackup.py --verbose` or `-v`
 
-### Restore (WIP)
+### Restore
 
 Example: `python3 crbbackup.py restore --file <file>`
 
-- Reads the configuration profile (stored in the backup file) and restores it to its original location.
+- Reads the backup zip file and restores the files to their original location.
+- Also restores the profile if it is missing.
 
 ## Limitations
 
 - You can only create full backups. Incremental & differential backups are not supported.
-- Restore is not yet supported. (WIP)

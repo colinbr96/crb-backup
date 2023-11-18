@@ -3,6 +3,7 @@ import logging
 
 from src.backup import backup
 from src.initialize import initialize
+from src.restore import restore
 
 
 def configure_logger(verbose):
@@ -25,7 +26,7 @@ def parse_args():
     backup_parser.add_argument("-p", "--profile", required=True)
 
     restore_parser = sub_parsers.add_parser("restore")
-    restore_parser.add_argument("-p", "--profile", required=True)
+    restore_parser.add_argument("-f", "--file", required=True)
 
     args = parser.parse_args()
     return args
@@ -41,7 +42,7 @@ def main():
         case "backup":
             backup(args.profile)
         case "restore":
-            print("Restore is not currently implemented. Please check back later.")
+            restore(args.file)
 
 
 if __name__ == "__main__":

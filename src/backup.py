@@ -10,7 +10,7 @@ from pathlib import Path
 
 from src.profile import Profile
 from src.utils.formatting import format_bytes
-from src.utils.paths import path_to_drive_letter_dir
+from src.utils.paths import absolute_path_to_relative_path
 
 
 class BackupStats:
@@ -79,9 +79,9 @@ def archive_files(files: list[Path], profile: Profile):
 
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
         for file in files:
-            arcname = path_to_drive_letter_dir(file)
-            logging.debug(f"Adding: {arcname}")
-            zipf.write(file, arcname)
+            dst_path = absolute_path_to_relative_path(file)
+            logging.debug(f"Saving: {dst_path}")
+            zipf.write(file, dst_path)
         zipf.writestr("profile.json", json.dumps(profile.to_json()))
 
     return zip_filename

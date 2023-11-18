@@ -32,6 +32,19 @@ class Profile:
         }
 
     @classmethod
+    def from_json(cls, data: dict):
+        version = data["version"]
+
+        # TODO: Check version # and alter serialization behavior
+        if version != SERIALIZATION_VERSION:
+            raise ValueError(f"Unsupported serialization version: {version}")
+
+        name = data["name"]
+        destination = Path(data["destination"])
+        sources = [Path(source) for source in data["sources"]]
+        return cls(name, destination, sources)
+
+    @classmethod
     def load(cls, name: str) -> "Profile":
         filename = f"profiles/{name}.json"
         try:
