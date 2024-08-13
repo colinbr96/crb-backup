@@ -34,20 +34,20 @@ class BackupStats:
         return "Backup Stats:\n" + textwrap.indent(stats_msg, " " * 2)
 
 
-def backup(profile_name: str):
+def backup_command(profile_name: str):
     profile = Profile.load(profile_name)
-    files_to_backup, stats = get_files_to_backup(profile)
+    files_to_backup, stats = _get_files_to_backup(profile)
 
     if not files_to_backup:
         logging.error("No files to backup")
         sys.exit(1)
 
-    zip_filename = archive_files(files_to_backup, profile)
+    zip_filename = _archive_files(files_to_backup, profile)
     stats.dst_bytes = os.path.getsize(zip_filename)
     logging.info(stats)
 
 
-def get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
+def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
     stats = BackupStats()
     files: list[Path] = []
 
@@ -71,7 +71,7 @@ def get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
     return files, stats
 
 
-def archive_files(files: list[Path], profile: Profile):
+def _archive_files(files: list[Path], profile: Profile):
     now = datetime.now()
     zip_filename = f'{profile.name}-{now.strftime("%Y-%m-%dT%H-%M-%S")}.zip'
     zip_filename = os.path.join(profile.destination, zip_filename)

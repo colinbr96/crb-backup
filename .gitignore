@@ -1,4 +1,12 @@
-/.vscode/
+# Python
 __pycache__/
+
+# IDE
+/.vscode/
+
+# MacOS
+.DS_Store
+
+# CRB Backup
 /profiles/
 *.zip

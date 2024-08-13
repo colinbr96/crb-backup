@@ -1,9 +1,12 @@
 import json
 import logging
 import os
+import re
 import sys
 from pathlib import Path
 
+
+PROFILE_REGEX = "^[A-Za-z0-9_\-]+$"
 SERIALIZATION_VERSION = 1
 
 
@@ -61,3 +64,55 @@ class Profile:
             [Path(source) for source in obj["sources"]],
         )
         return profile
+
+
+def _prompt_profile_name() -> str:
+    try:
+        while True:
+            profile_name = input("Create a profile name: ")
+            if not re.fullmatch(PROFILE_REGEX, profile_name):
+                logging.error(f"Profile name must match {PROFILE_REGEX}")
+            else:
+                break
+    except KeyboardInterrupt:
+        sys.exit(0)
+    return profile_name
+
+
+def _prompt_destination() -> Path:
+    try:
+        while True:
+            destination = Path(input("Destination directory: "))
+            if str(destination).startswith('~'):
+                destination = destination.expanduser()
+            if not destination.exists():
+                logging.error(f"That directory does not exist")
+            else:
+                break
+    except KeyboardInterrupt:
+        sys.exit(0)
+    return destination
+
+
+def _create_profile(profile_name: str, destination: Path):
+    try:
+        profile = Profile(profile_name, destination)
+        profile_filename = profile.save()
+    except FileExistsError:
+        print(f'Error: Profile named "{profile_name}" already exists', file=sys.stderr)
+        sys.exit(1)
+    print(f"Profile created at: {profile_filename}")
+    print("Edit it to add backup sources.")
+
+
+def _add_profile():
+    profile_name = _prompt_profile_name()
+    destination = _prompt_destination()
+    _create_profile(profile_name, destination)
+
+
+def profile_command(args):
+    match args.profile_action:
+        case "add":
+            _add_profile()
+        # TODO handle edit/remove

@@ -7,7 +7,7 @@ A Python CLI tool to create and execute filesystem backups
 1. Install [Python 3.11](https://www.python.org/downloads/) or higher.
 2. `git clone git@github.com:colinbr96/crb-backup.git`
 3. `cd crb-backup/`
-4. `python3 crbbackup.py init`
+4. `python3 crbbackup.py profile add`
 5. Enter a profile name and a destination folder. The destination is where the backup zip files will be created.
 6. Edit the profile JSON file to add a list of `sources`. These are the folders that will be backed up. Feel free to use [glob](https://docs.python.org/3/library/glob.html) patterns to only match certain types of files/folders.
 

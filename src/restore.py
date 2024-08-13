@@ -9,7 +9,7 @@ from src.profile import Profile
 from src.utils.paths import relative_path_to_absolute_path
 
 
-def restore(zip_filename: str):
+def restore_command(zip_filename: str):
     with tempfile.TemporaryDirectory(prefix="crb-restore_") as temp_dir:
         print(temp_dir)
         with zipfile.ZipFile(zip_filename, "r") as zipf:
