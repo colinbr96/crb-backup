@@ -25,4 +25,12 @@ def relative_path_to_absolute_path(path: Path):
 
 
 def should_ignore_file(file: Path, ignore_list: list[Path]) -> bool:
-    return ignore_list and any(ignored in file.parents for ignored in ignore_list)
+    ignored = False
+    for ignored_path in ignore_list:
+        if ignored_path.is_dir():
+            ignored = ignored_path in file.parents
+        else:
+            ignored = ignored_path.name == file.name
+        if ignored:
+            break
+    return ignored

@@ -77,10 +77,8 @@ def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
             if source == ignored
             or source in ignored.parents
             or ignored in source.parents
+            or not ignored.is_dir()
         ]
-        logging.debug(
-            f"Relevant ignore list: {', '.join([str(path) for path in relevant_ignore_list])}"
-        )
 
         if source.is_dir():
             source = source / "**/*"
