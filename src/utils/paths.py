@@ -22,3 +22,7 @@ def relative_path_to_absolute_path(path: Path):
     """
     root, *rest_of_path = path.parts
     return Path(root + ":" + os.path.sep) / Path(*rest_of_path)
+
+
+def should_ignore_file(file: Path, ignore_list: list[Path]) -> bool:
+    return ignore_list and any(ignored in file.parents for ignored in ignore_list)

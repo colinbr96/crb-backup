@@ -11,10 +11,17 @@ SERIALIZATION_VERSION = 1
 
 
 class Profile:
-    def __init__(self, name: str, destination: Path, sources: list[Path] = []):
+    def __init__(
+        self,
+        name: str,
+        destination: Path,
+        sources: list[Path] = [],
+        ignore_list: list[Path] = [],
+    ):
         self.name = name
         self.destination: Path = destination
         self.sources: list[Path] = sources
+        self.ignore_list: list[Path] = ignore_list
 
     def save(self) -> str:
         obj = self.to_json()
@@ -26,11 +33,12 @@ class Profile:
             json.dump(obj, f, indent=2)
         return filename
 
-    def to_json(self):
+    def to_json(self) -> dict:
         return {
             "version": SERIALIZATION_VERSION,
             "name": self.name,
             "sources": [str(source) for source in self.sources],
+            "ignore_list": [str(ignored) for ignored in self.ignore_list],
             "destination": str(self.destination),
         }
 
@@ -52,16 +60,17 @@ class Profile:
         filename = f"profiles/{name}.json"
         try:
             with open(filename, "r") as f:
-                obj = json.load(f)
+                data = json.load(f)
         except FileNotFoundError:
             logging.error(f"Profile {name} not found")
             sys.exit(1)
 
         # TODO: Check version # and alter deserialization behavior
         profile = cls(
-            obj["name"],
-            Path(obj["destination"]),
-            [Path(source) for source in obj["sources"]],
+            data["name"],
+            Path(data["destination"]),
+            [Path(source) for source in data["sources"]],
+            [Path(ignored) for ignored in data["ignore_list"]],
         )
         return profile
 
@@ -83,7 +92,7 @@ def _prompt_destination() -> Path:
     try:
         while True:
             destination = Path(input("Destination directory: "))
-            if str(destination).startswith('~'):
+            if str(destination).startswith("~"):
                 destination = destination.expanduser()
             if not destination.exists():
                 logging.error(f"That directory does not exist")
