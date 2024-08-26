@@ -65,11 +65,6 @@ def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
     for source in profile.sources:
         stats.sources += 1
 
-        if not source.exists():
-            logging.warn(f"Source doesn't exist: {source}")
-            stats.warnings += 1
-            continue
-
         # Filter ignore list to only those that fall within this source
         relevant_ignore_list = [
             ignored
