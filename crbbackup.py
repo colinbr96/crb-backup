@@ -54,7 +54,7 @@ def main():
         case "restore":
             restore_command(args.file)
         case "profile":
-            profile_command(args)
+            profile_command(args.profile_action)
 
 
 if __name__ == "__main__":

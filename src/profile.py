@@ -120,8 +120,8 @@ def _add_profile():
     _create_profile(profile_name, destination)
 
 
-def profile_command(args):
-    match args.profile_action:
+def profile_command(action):
+    match action:
         case "add":
             _add_profile()
         # TODO handle edit/remove
