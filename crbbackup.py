@@ -26,6 +26,7 @@ def parse_args():
 
     backup_parser = action_parsers.add_parser("backup")
     backup_parser.add_argument("-p", "--profile", required=True)
+    backup_parser.add_argument("-o", "--output-csv", action="store_true")
 
     restore_parser = action_parsers.add_parser("restore")
     restore_parser.add_argument("-f", "--file", required=True)
@@ -50,7 +51,7 @@ def main():
 
     match args.action:
         case "backup":
-            backup_command(args.profile)
+            backup_command(args.profile, args.output_csv)
         case "restore":
             restore_command(args.file)
         case "profile":

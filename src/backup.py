@@ -1,3 +1,4 @@
+import csv
 import glob
 import json
 import logging
@@ -42,7 +43,8 @@ class BackupStats:
         return "Backup Stats:\n" + textwrap.indent(stats_msg, " " * 2)
 
 
-def backup_command(profile_name: str):
+def backup_command(profile_name: str, output_csv: bool):
+    start_time = datetime.now()
     profile = Profile.load(profile_name)
     files_to_backup, stats = _get_files_to_backup(profile)
 
@@ -52,9 +54,12 @@ def backup_command(profile_name: str):
         logging.error("No files to backup")
         sys.exit(1)
 
-    zip_filename = _archive_files(files_to_backup, profile)
+    zip_filename = _archive_files(start_time, files_to_backup, profile)
     stats.dst_bytes = os.path.getsize(zip_filename)
     logging.info(stats)
+
+    if output_csv:
+        _write_csv_output(start_time, files_to_backup, profile)
 
 
 def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
@@ -92,17 +97,30 @@ def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
     return files, stats
 
 
-def _archive_files(files: list[Path], profile: Profile):
-    now = datetime.now()
-    zip_filename = f'{profile.name}-{now.strftime("%Y-%m-%dT%H-%M-%S")}.zip'
+def _archive_files(date: datetime, files: list[Path], profile: Profile):
+    zip_filename = f'{profile.name}-{date.strftime("%Y-%m-%dT%H-%M-%S")}.zip'
     zip_filename = os.path.join(profile.destination, zip_filename)
     logging.info(f"Creating backup archive: {zip_filename}")
 
-    with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as f:
         for file in files:
             dst_path = absolute_path_to_relative_path(file)
             logging.debug(f"Saving: {dst_path}")
-            zipf.write(file, dst_path)
-        zipf.writestr("profile.json", json.dumps(profile.to_json()))
+            f.write(file, dst_path)
+        f.writestr("profile.json", json.dumps(profile.to_json()))
 
     return zip_filename
+
+
+def _write_csv_output(date: datetime, files: list[Path], profile: Profile):
+    csv_filename = f'{profile.name}-{date.strftime("%Y-%m-%dT%H-%M-%S")}.csv'
+    csv_filename = os.path.join(profile.destination, csv_filename)
+    logging.info(f"Creating backup file list CSV: {csv_filename}")
+
+    with open(csv_filename, "w") as f:
+        csv_writer = csv.writer(f)
+        csv_writer.writerow(["Source", "Bytes"])
+        for file in files:
+            csv_writer.writerow([str(file), file.stat().st_size if not file.is_dir() else 0])
+
+    return csv_filename
