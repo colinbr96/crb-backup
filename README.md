@@ -28,6 +28,12 @@ Example profile file:
 
 ## Usage
 
+### Profile management
+
+Example: `python3 crbbackup.py profile add`
+
+- Creates a new profile using interactive prompts.
+
 ### Backup
 
 Example: `python3 crbbackup.py backup --profile <profile>`
