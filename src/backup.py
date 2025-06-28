@@ -117,10 +117,12 @@ def _write_csv_output(date: datetime, files: list[Path], profile: Profile):
     csv_filename = os.path.join(profile.destination, csv_filename)
     logging.info(f"Creating backup file list CSV: {csv_filename}")
 
-    with open(csv_filename, "w") as f:
+    with open(csv_filename, "w", newline="") as f:
         csv_writer = csv.writer(f)
         csv_writer.writerow(["Source", "Bytes"])
         for file in files:
-            csv_writer.writerow([str(file), file.stat().st_size if not file.is_dir() else 0])
+            csv_writer.writerow(
+                [str(file), file.stat().st_size if not file.is_dir() else 0]
+            )
 
     return csv_filename
