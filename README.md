@@ -41,11 +41,11 @@ Example: `python3 crbbackup.py backup --profile <profile>`
 - Reads the configuration profile and copies all input files to the specified destination.
 - The profile file is included in the backup archive.
 - To see a list of all files as they are backed up, use `crbbackup.py --verbose` or `-vv`
-- To output a CSV with a list of all backed-up files, use `--output-csv` or `-o`
+- To output a CSV with a list of all backed-up files, use `--output-csv`
 
 ### Restore
 
-Example: `python3 crbbackup.py restore --file <file>`
+Example: `python3 crbbackup.py restore --file <file> --overwrite <y,n,ask>`
 
 - Reads the backup zip file and restores the files to their original location.
 - Also restores the profile if it is missing.

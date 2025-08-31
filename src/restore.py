@@ -9,7 +9,19 @@ from src.profile import Profile
 from src.utils.paths import relative_path_to_absolute_path
 
 
-def restore_command(zip_filename: str):
+def restore_command(zip_filename: str, overwrite: str):
+    """
+    Restore files from a backup zip file to their original locations.
+
+    Args:
+        zip_filename (str): The path to the backup zip file.
+        overwrite (str): Overwrite behavior for existing files.
+            "y" - Always overwrite
+            "n" - Never overwrite
+            "ask" - Ask before overwriting
+    """
+    assert overwrite in {"y", "n", "ask"}
+
     with tempfile.TemporaryDirectory(prefix="crb-restore_") as temp_dir:
         print(temp_dir)
         with zipfile.ZipFile(zip_filename, "r") as zipf:
@@ -30,10 +42,20 @@ def restore_command(zip_filename: str):
                 if not file_info.is_dir() and file_info.filename != "profile.json":
                     src_path = Path(temp_dir) / file_info.filename
                     dst_path = relative_path_to_absolute_path(Path(file_info.filename))
-                    exists_msg = (
-                        "(overwrite)" if os.path.exists(dst_path) else "(missing)"
-                    )
-                    logging.debug(f"Restoring: {dst_path} {exists_msg}")
+
+                    file_exists = os.path.exists(dst_path)
+                    if file_exists:
+                        if overwrite == "n":
+                            logging.debug(f"Skipping existing file: {dst_path}")
+                            continue
+                        elif overwrite == "ask":
+                            response = input(f"File {dst_path} exists. Overwrite? (y/n): ").strip().lower()
+                            if response != "y":
+                                logging.debug(f"Declined to restore file: {dst_path}")
+                                continue
+
+                    file_status_str = "(new)" if not file_exists else "(overwritten)"
+                    logging.debug(f"Restoring: {dst_path} {file_status_str}")
                     os.makedirs(os.path.dirname(dst_path), exist_ok=True)
                     os.replace(src_path, dst_path)
 

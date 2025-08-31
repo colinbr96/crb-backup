@@ -26,10 +26,11 @@ def parse_args():
 
     backup_parser = action_parsers.add_parser("backup")
     backup_parser.add_argument("-p", "--profile", required=True)
-    backup_parser.add_argument("-o", "--output-csv", action="store_true")
+    backup_parser.add_argument("--output-csv", action="store_true")
 
     restore_parser = action_parsers.add_parser("restore")
     restore_parser.add_argument("-f", "--file", required=True)
+    restore_parser.add_argument("--overwrite", choices=["y", "n", "ask"], required=True)
 
     profile_parser = action_parsers.add_parser("profile")
     profile_action_parsers = profile_parser.add_subparsers(dest="profile_action", required=True)
@@ -53,7 +54,7 @@ def main():
         case "backup":
             backup_command(args.profile, args.output_csv)
         case "restore":
-            restore_command(args.file)
+            restore_command(args.file, args.overwrite)
         case "profile":
             profile_command(args.profile_action)
 
