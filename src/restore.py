@@ -24,8 +24,9 @@ def restore_command(zip_filename: str, overwrite: str):
     assert overwrite in {"y", "n", "ask"}
 
     with tempfile.TemporaryDirectory(prefix="crb-restore_") as temp_dir:
-        print(temp_dir)
+        logging.debug(f"Created temporary directory to restore from: {temp_dir}")
         with zipfile.ZipFile(zip_filename, "r") as zipf:
+            logging.debug(f"Extracting zip archive: {zip_filename}")
             # Extract files from the zip to the temporary directory
             zipf.extractall(path=temp_dir)
 
@@ -38,7 +39,6 @@ def restore_command(zip_filename: str, overwrite: str):
             except FileExistsError:
                 logging.warning("Profile already exists, skipping its recovery")
 
-            # Move files to their original locations
             for file_info in zipf.infolist():
                 if not file_info.is_dir() and file_info.filename != "profile.json":
                     src_path = Path(temp_dir) / file_info.filename
@@ -64,6 +64,7 @@ def restore_command(zip_filename: str, overwrite: str):
                                 logging.debug(f"Declined to restore file: {dst_path}")
                                 continue
 
+                    # Move file to its original location
                     file_status_str = "(new)" if not file_exists else "(overwritten)"
                     logging.debug(f"Restoring: {dst_path} {file_status_str}")
                     os.makedirs(os.path.dirname(dst_path), exist_ok=True)
