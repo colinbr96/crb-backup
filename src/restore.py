@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import os
@@ -48,8 +49,17 @@ def restore_command(zip_filename: str, overwrite: str):
                         if overwrite == "n":
                             logging.debug(f"Skipping existing file: {dst_path}")
                             continue
-                        elif overwrite == "ask":
-                            response = input(f"File {dst_path} exists. Overwrite? (y/n): ").strip().lower()
+
+                        # Check if files are identical by comparing their hashes
+                        src_hash = hashlib.sha256(src_path.read_bytes()).hexdigest()
+                        dst_hash = hashlib.sha256(dst_path.read_bytes()).hexdigest()
+                        if src_hash == dst_hash:
+                            logging.debug(f"Skipping identical file: {dst_path}")
+                            continue
+
+                        # If overwrite is set to "ask", prompt the user for confirmation
+                        if overwrite == "ask":
+                            response = input(f"File {dst_path} already exists. Overwrite? (y/n): ").strip().lower()
                             if response != "y":
                                 logging.debug(f"Declined to restore file: {dst_path}")
                                 continue
