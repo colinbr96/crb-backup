@@ -46,6 +46,7 @@ class BackupStats:
 def backup_command(profile_name: str, output_csv: bool):
     start_time = datetime.now()
     profile = Profile.load(profile_name)
+    _check_dest_exists(profile)
     files_to_backup, stats = _get_files_to_backup(profile)
 
     if not files_to_backup:
@@ -60,6 +61,12 @@ def backup_command(profile_name: str, output_csv: bool):
 
     if output_csv:
         _write_csv_output(start_time, files_to_backup, profile)
+
+
+def _check_dest_exists(profile: Profile):
+    if not os.path.exists(profile.destination):
+        logging.error(f"Destination folder does not exist: {profile.destination}")
+        sys.exit(1)
 
 
 def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
