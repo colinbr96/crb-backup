@@ -7,6 +7,7 @@ import zipfile
 from pathlib import Path
 
 from src.profile import Profile
+from src.utils.user_input import input_yes_no
 from src.utils.paths import relative_path_to_absolute_path
 
 
@@ -59,8 +60,9 @@ def restore_command(zip_filename: str, overwrite: str):
 
                         # If overwrite is set to "ask", prompt the user for confirmation
                         if overwrite == "ask":
-                            response = input(f"File {dst_path} already exists. Overwrite? (y/n): ").strip().lower()
-                            if response != "y":
+                            if not input_yes_no(
+                                f"File {dst_path} already exists. Overwrite? (y/n): ",
+                            ):
                                 logging.debug(f"Declined to restore file: {dst_path}")
                                 continue
 
