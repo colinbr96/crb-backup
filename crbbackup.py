@@ -33,7 +33,9 @@ def parse_args():
 
     restore_parser = action_parsers.add_parser("restore")
     restore_parser.add_argument("-f", "--file", required=True)
-    restore_parser.add_argument("--overwrite", choices=["y", "n", "ask"], required=True)
+    restore_parser.add_argument(
+        "--overwrite", choices=["y", "n", "ask", "diff"], required=True
+    )
 
     profile_parser = action_parsers.add_parser("profile")
     profile_action_parsers = profile_parser.add_subparsers(

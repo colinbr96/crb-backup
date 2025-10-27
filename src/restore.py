@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import subprocess
 import tempfile
 import zipfile
 from pathlib import Path
@@ -22,7 +23,7 @@ def restore_command(zip_filename: str, overwrite: str):
             "n" - Never overwrite
             "ask" - Ask before overwriting
     """
-    assert overwrite in {"y", "n", "ask"}
+    assert overwrite in {"y", "n", "ask", "diff"}
 
     with tempfile.TemporaryDirectory(prefix="crb-restore_") as temp_dir:
         logging.debug(f"Created temporary directory to restore from: {temp_dir}")
@@ -58,8 +59,15 @@ def restore_command(zip_filename: str, overwrite: str):
                             logging.debug(f"Skipping identical file: {dst_path}")
                             continue
 
-                        # If overwrite is set to "ask", prompt the user for confirmation
-                        if overwrite == "ask":
+                        if overwrite == "diff":
+                            logging.info(
+                                f"File {dst_path} already exists. Showing diff:"
+                            )
+                            subprocess.run(
+                                ["diff", "--unified", "--color", dst_path, src_path]
+                            )
+
+                        if overwrite in {"ask", "diff"}:
                             if not input_yes_no(
                                 f"File {dst_path} already exists. Overwrite? (y/n): ",
                             ):
