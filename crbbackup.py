@@ -1,5 +1,6 @@
 import argparse
 import logging
+import sys
 
 from src.backup import backup_command
 from src.profile import profile_command
@@ -19,7 +20,9 @@ def configure_logger(verbose):
 
 def parse_args():
     parser = argparse.ArgumentParser(prog="crbbackup.py")
-    parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {APP_VERSION}")
+    parser.add_argument(
+        "-v", "--version", action="version", version=f"%(prog)s {APP_VERSION}"
+    )
     parser.add_argument("-vv", "--verbose", action="store_true")
 
     action_parsers = parser.add_subparsers(dest="action", required=True)
@@ -33,7 +36,9 @@ def parse_args():
     restore_parser.add_argument("--overwrite", choices=["y", "n", "ask"], required=True)
 
     profile_parser = action_parsers.add_parser("profile")
-    profile_action_parsers = profile_parser.add_subparsers(dest="profile_action", required=True)
+    profile_action_parsers = profile_parser.add_subparsers(
+        dest="profile_action", required=True
+    )
 
     profile_action_parsers.add_parser("add")
     # profile_edit_parser = profile_action_parsers.add_parser("edit")
@@ -50,13 +55,16 @@ def main():
     args = parse_args()
     configure_logger(args.verbose)
 
-    match args.action:
-        case "backup":
-            backup_command(args.profile, args.output_csv)
-        case "restore":
-            restore_command(args.file, args.overwrite)
-        case "profile":
-            profile_command(args.profile_action)
+    try:
+        match args.action:
+            case "backup":
+                backup_command(args.profile, args.output_csv)
+            case "restore":
+                restore_command(args.file, args.overwrite)
+            case "profile":
+                profile_command(args.profile_action)
+    except KeyboardInterrupt:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
