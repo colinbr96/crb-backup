@@ -10,12 +10,12 @@ from src.restore import restore_command
 APP_VERSION = "0.2"
 
 
-def configure_logger(verbose):
+def configure_logger():
     handler = logging.StreamHandler()
     handler.setFormatter(fmt=logging.Formatter("%(levelname)s: %(message)s"))
     logger = logging.getLogger()
     logger.addHandler(handler)
-    logger.setLevel(level=logging.DEBUG if verbose else logging.INFO)
+    logger.setLevel(level=logging.DEBUG)
 
 
 def parse_args():
@@ -23,7 +23,6 @@ def parse_args():
     parser.add_argument(
         "-v", "--version", action="version", version=f"%(prog)s {APP_VERSION}"
     )
-    parser.add_argument("-vv", "--verbose", action="store_true")
 
     action_parsers = parser.add_subparsers(dest="action", required=True)
 
@@ -55,7 +54,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    configure_logger(args.verbose)
+    configure_logger()
 
     try:
         match args.action:
