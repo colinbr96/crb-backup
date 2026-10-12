@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 
-PROFILE_REGEX = "^[A-Za-z0-9_\-]+$"
+PROFILE_REGEX = r"^[A-Za-z0-9_\-]+$"
 SERIALIZATION_VERSION = 1
 
 

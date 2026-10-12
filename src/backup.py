@@ -126,10 +126,14 @@ def _write_csv_output(date: datetime, files: list[Path], profile: Profile):
 
     with open(csv_filename, "w", newline="") as f:
         csv_writer = csv.writer(f)
-        csv_writer.writerow(["Source", "Bytes"])
+        csv_writer.writerow(["Source", "Bytes", "Last Modified"])
         for file in files:
+            stat = file.stat()
+            modified = datetime.fromtimestamp(stat.st_mtime).isoformat(
+                sep=" ", timespec="seconds"
+            )
             csv_writer.writerow(
-                [str(file), file.stat().st_size if not file.is_dir() else 0]
+                [str(file), stat.st_size if not file.is_dir() else 0, modified]
             )
 
     return csv_filename
