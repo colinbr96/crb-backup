@@ -1,3 +1,18 @@
+[project]
+name = "crb-backup"
+version = "0.2"
+description = "A Python CLI tool to create and execute filesystem backups"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.17",
+    "ty>=0.0.95",
+]
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
