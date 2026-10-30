@@ -6,7 +6,6 @@ from src.backup import backup_command
 from src.profile import profile_command
 from src.restore import restore_command
 
-
 APP_VERSION = "0.2"
 
 

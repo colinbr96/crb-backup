@@ -88,9 +88,11 @@ class TestMain:
 
     def test_keyboard_interrupt_exits_with_1(self, argv):
         argv("profile", "add")
-        with mock.patch.object(
-            crbbackup, "profile_command", side_effect=KeyboardInterrupt
+        with (
+            mock.patch.object(
+                crbbackup, "profile_command", side_effect=KeyboardInterrupt
+            ),
+            pytest.raises(SystemExit) as exc_info,
         ):
-            with pytest.raises(SystemExit) as exc_info:
-                crbbackup.main()
+            crbbackup.main()
         assert exc_info.value.code == 1

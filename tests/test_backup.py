@@ -108,10 +108,12 @@ class TestGetFilesToBackup:
         assert "d.log" not in relative_names(files, source_tree)
         assert stats.ignored_files == 1
 
-    def test_ignored_directory_outside_source_has_no_effect(self, source_tree, tmp_path, dest):
+    def test_ignored_directory_outside_source_has_no_effect(
+        self, source_tree, tmp_path, dest
+    ):
         unrelated = tmp_path / "unrelated"
         unrelated.mkdir()
-        files, stats = _get_files_to_backup(
+        _files, stats = _get_files_to_backup(
             Profile("p", dest, [source_tree], [unrelated])
         )
         assert stats.files == 4
@@ -121,7 +123,11 @@ class TestGetFilesToBackup:
         files, _ = _get_files_to_backup(
             Profile("p", dest, [source_tree / "**" / "*.txt"], [])
         )
-        assert relative_names(files, source_tree) == ["a.txt", "skip/c.txt", "sub/b.txt"]
+        assert relative_names(files, source_tree) == [
+            "a.txt",
+            "skip/c.txt",
+            "sub/b.txt",
+        ]
 
     def test_single_file_source(self, source_tree, dest):
         files, stats = _get_files_to_backup(

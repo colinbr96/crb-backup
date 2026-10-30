@@ -13,6 +13,8 @@ from src.profile import Profile
 from src.utils.formatting import format_bytes
 from src.utils.paths import absolute_path_to_relative_path, should_ignore_file
 
+logger = logging.getLogger(__name__)
+
 
 class BackupStats:
     sources = 0  # Number of sources seen
@@ -51,13 +53,13 @@ def backup_command(profile_name: str, output_csv: bool):
 
     if not files_to_backup:
         stats.errors += 1
-        logging.info(stats)
-        logging.error("No files to backup")
+        logger.info(stats)
+        logger.error("No files to backup")
         sys.exit(1)
 
     zip_filename = _archive_files(start_time, files_to_backup, profile)
     stats.dst_bytes = os.path.getsize(zip_filename)
-    logging.info(stats)
+    logger.info(stats)
 
     if output_csv:
         _write_csv_output(start_time, files_to_backup, profile)
@@ -65,7 +67,7 @@ def backup_command(profile_name: str, output_csv: bool):
 
 def _check_dest_exists(profile: Profile):
     if not os.path.exists(profile.destination):
-        logging.error(f"Destination folder does not exist: {profile.destination}")
+        logger.error(f"Destination folder does not exist: {profile.destination}")
         sys.exit(1)
 
 
@@ -94,7 +96,7 @@ def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
             glob_path = Path(glob_file)
             if glob_path.is_file():
                 if should_ignore_file(glob_path, relevant_ignore_list):
-                    logging.debug(f"Ignoring: {glob_path}")
+                    logger.debug(f"Ignoring: {glob_path}")
                     stats.ignored_files += 1
                 else:
                     files.append(glob_path)
@@ -105,14 +107,14 @@ def _get_files_to_backup(profile: Profile) -> tuple[list[Path], BackupStats]:
 
 
 def _archive_files(date: datetime, files: list[Path], profile: Profile):
-    zip_filename = f'{profile.name}-{date.strftime("%Y-%m-%dT%H-%M-%S")}.zip'
+    zip_filename = f"{profile.name}-{date.strftime('%Y-%m-%dT%H-%M-%S')}.zip"
     zip_filename = os.path.join(profile.destination, zip_filename)
-    logging.info(f"Creating backup archive: {zip_filename}")
+    logger.info(f"Creating backup archive: {zip_filename}")
 
     with zipfile.ZipFile(zip_filename, "w", zipfile.ZIP_DEFLATED) as f:
         for file in files:
             dst_path = absolute_path_to_relative_path(file)
-            logging.debug(f"Saving: {dst_path}")
+            logger.debug(f"Saving: {dst_path}")
             f.write(file, dst_path)
         f.writestr("profile.json", json.dumps(profile.to_json()))
 
@@ -120,9 +122,9 @@ def _archive_files(date: datetime, files: list[Path], profile: Profile):
 
 
 def _write_csv_output(date: datetime, files: list[Path], profile: Profile):
-    csv_filename = f'{profile.name}-{date.strftime("%Y-%m-%dT%H-%M-%S")}.csv'
+    csv_filename = f"{profile.name}-{date.strftime('%Y-%m-%dT%H-%M-%S')}.csv"
     csv_filename = os.path.join(profile.destination, csv_filename)
-    logging.info(f"Creating backup file list CSV: {csv_filename}")
+    logger.info(f"Creating backup file list CSV: {csv_filename}")
 
     with open(csv_filename, "w", newline="") as f:
         csv_writer = csv.writer(f)
