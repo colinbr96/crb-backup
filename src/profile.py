@@ -5,9 +5,10 @@ import re
 import sys
 from pathlib import Path
 
-
 PROFILE_REGEX = r"^[A-Za-z0-9_\-]+$"
 SERIALIZATION_VERSION = 1
+
+logger = logging.getLogger(__name__)
 
 
 class Profile:
@@ -15,13 +16,13 @@ class Profile:
         self,
         name: str,
         destination: Path,
-        sources: list[Path] = [],
-        ignore_list: list[Path] = [],
+        sources: list[Path] | None = None,
+        ignore_list: list[Path] | None = None,
     ):
         self.name = name
         self.destination: Path = destination
-        self.sources: list[Path] = sources
-        self.ignore_list: list[Path] = ignore_list
+        self.sources: list[Path] = [] if sources is None else sources
+        self.ignore_list: list[Path] = [] if ignore_list is None else ignore_list
 
     def save(self) -> str:
         obj = self.to_json()
@@ -62,7 +63,7 @@ class Profile:
             with open(filename, "r") as f:
                 data = json.load(f)
         except FileNotFoundError:
-            logging.error(f"Profile {name} not found")
+            logger.error(f"Profile {name} not found")
             sys.exit(1)
 
         # TODO: Check version # and alter deserialization behavior
@@ -80,7 +81,7 @@ def _prompt_profile_name() -> str:
         while True:
             profile_name = input("Create a profile name: ")
             if not re.fullmatch(PROFILE_REGEX, profile_name):
-                logging.error(f"Profile name must match {PROFILE_REGEX}")
+                logger.error(f"Profile name must match {PROFILE_REGEX}")
             else:
                 break
     except KeyboardInterrupt:
@@ -95,7 +96,7 @@ def _prompt_destination() -> Path:
             if str(destination).startswith("~"):
                 destination = destination.expanduser()
             if not destination.exists():
-                logging.error(f"That directory does not exist")
+                logger.error("That directory does not exist")
             else:
                 break
     except KeyboardInterrupt:

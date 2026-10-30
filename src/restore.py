@@ -8,8 +8,10 @@ import zipfile
 from pathlib import Path
 
 from src.profile import Profile
-from src.utils.user_input import input_yes_no
 from src.utils.paths import relative_path_to_absolute_path
+from src.utils.user_input import input_yes_no
+
+logger = logging.getLogger(__name__)
 
 
 def restore_command(zip_filename: str, overwrite: str):
@@ -26,9 +28,9 @@ def restore_command(zip_filename: str, overwrite: str):
     assert overwrite in {"y", "n", "ask", "diff"}
 
     with tempfile.TemporaryDirectory(prefix="crb-restore_") as temp_dir:
-        logging.debug(f"Created temporary directory to restore from: {temp_dir}")
+        logger.debug(f"Created temporary directory to restore from: {temp_dir}")
         with zipfile.ZipFile(zip_filename, "r") as zipf:
-            logging.debug(f"Extracting zip archive: {zip_filename}")
+            logger.debug(f"Extracting zip archive: {zip_filename}")
             # Extract files from the zip to the temporary directory
             zipf.extractall(path=temp_dir)
 
@@ -39,7 +41,7 @@ def restore_command(zip_filename: str, overwrite: str):
             try:
                 profile.save()
             except FileExistsError:
-                logging.warning("Profile already exists, skipping its recovery")
+                logger.warning("Profile already exists, skipping its recovery")
 
             for file_info in zipf.infolist():
                 if not file_info.is_dir() and file_info.filename != "profile.json":
@@ -49,35 +51,35 @@ def restore_command(zip_filename: str, overwrite: str):
                     file_exists = os.path.exists(dst_path)
                     if file_exists:
                         if overwrite == "n":
-                            logging.debug(f"Skipping existing file: {dst_path}")
+                            logger.debug(f"Skipping existing file: {dst_path}")
                             continue
 
                         # Check if files are identical by comparing their hashes
                         src_hash = hashlib.sha256(src_path.read_bytes()).hexdigest()
                         dst_hash = hashlib.sha256(dst_path.read_bytes()).hexdigest()
                         if src_hash == dst_hash:
-                            logging.debug(f"Skipping identical file: {dst_path}")
+                            logger.debug(f"Skipping identical file: {dst_path}")
                             continue
 
                         if overwrite == "diff":
-                            logging.info(
+                            logger.info(
                                 f"File {dst_path} already exists. Showing diff:"
                             )
                             subprocess.run(
-                                ["diff", "--unified", "--color", dst_path, src_path]
+                                ["diff", "--unified", "--color", dst_path, src_path],
+                                check=False,  # diff exits non-zero when files differ
                             )
 
-                        if overwrite in {"ask", "diff"}:
-                            if not input_yes_no(
-                                f"File {dst_path} already exists. Overwrite? (y/n): ",
-                            ):
-                                logging.debug(f"Declined to restore file: {dst_path}")
-                                continue
+                        if overwrite in {"ask", "diff"} and not input_yes_no(
+                            f"File {dst_path} already exists. Overwrite? (y/n): ",
+                        ):
+                            logger.debug(f"Declined to restore file: {dst_path}")
+                            continue
 
                     # Move file to its original location
                     file_status_str = "(new)" if not file_exists else "(overwritten)"
-                    logging.debug(f"Restoring: {dst_path} {file_status_str}")
+                    logger.debug(f"Restoring: {dst_path} {file_status_str}")
                     os.makedirs(os.path.dirname(dst_path), exist_ok=True)
                     os.replace(src_path, dst_path)
 
-    logging.info("Restore complete")
+    logger.info("Restore complete")

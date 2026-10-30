@@ -1,5 +1,4 @@
 import json
-import logging
 from pathlib import Path
 
 import pytest
@@ -55,22 +54,13 @@ class TestSerialization:
             Profile.from_json(data)
 
 
-@pytest.mark.xfail(
-    reason="Bug: mutable default arguments are shared between Profile instances",
-    strict=True,
-)
 def test_default_lists_are_not_shared(tmp_path):
     first = Profile("a", tmp_path)
-    try:
-        first.sources.append(Path("x"))
-        first.ignore_list.append(Path("y"))
-        second = Profile("b", tmp_path)
-        assert second.sources == []
-        assert second.ignore_list == []
-    finally:
-        # While the bug exists, these are the shared defaults; don't leak into other tests.
-        first.sources.clear()
-        first.ignore_list.clear()
+    first.sources.append(Path("x"))
+    first.ignore_list.append(Path("y"))
+    second = Profile("b", tmp_path)
+    assert second.sources == []
+    assert second.ignore_list == []
 
 
 class TestPersistence:
@@ -122,7 +112,9 @@ class TestPrompts:
         assert _prompt_profile_name() == "my_backup-1"
 
     @pytest.mark.parametrize("bad_name", ["", "has space", "slash/name", "dot.name"])
-    def test_prompt_profile_name_reprompts_on_invalid(self, fake_input, caplog, bad_name):
+    def test_prompt_profile_name_reprompts_on_invalid(
+        self, fake_input, caplog, bad_name
+    ):
         fake_input(bad_name, "good")
         assert _prompt_profile_name() == "good"
         assert "Profile name must match" in caplog.text
@@ -133,7 +125,9 @@ class TestPrompts:
             _prompt_profile_name()
         assert exc_info.value.code == 0
 
-    def test_prompt_destination_reprompts_until_exists(self, fake_input, tmp_path, caplog):
+    def test_prompt_destination_reprompts_until_exists(
+        self, fake_input, tmp_path, caplog
+    ):
         fake_input(str(tmp_path / "missing"), str(tmp_path))
         assert _prompt_destination() == tmp_path
         assert "That directory does not exist" in caplog.text
